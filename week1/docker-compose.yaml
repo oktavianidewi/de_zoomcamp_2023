@@ -1,0 +1,19 @@
+version: '3.7'
+services:
+  postgres-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ny_taxi
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    volumes:
+      - "./data:/var/lib/postgresql/learn/data"
+    network: pg-network
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U" ]
+      interval: 5s
+      retries: 5
+    restart: always
