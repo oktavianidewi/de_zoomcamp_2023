@@ -11,9 +11,24 @@ services:
       - 5432:5432
     volumes:
       - "./data:/var/lib/postgresql/learn/data"
-    network: pg-network
     healthcheck:
       test: [ "CMD", "pg_isready", "-U" ]
       interval: 5s
       retries: 5
     restart: always
+
+  # provide UI for postgres
+  postgres-admin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
+      PGADMIN_DEFAULT_PASSWORD: "root"
+    ports:
+      - "8080:80"
+  # provide jupyter 
+  jupyter-nb:
+    image: jupyter/minimal-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./jupyter:/home/jovyan/work
