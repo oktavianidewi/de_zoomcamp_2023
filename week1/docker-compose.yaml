@@ -10,7 +10,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - "./data:/var/lib/postgresql/learn/data"
+      # - "./data:/var/lib/postgresql/learn/data" # volume is mounted to a Windows file system directory (/mnt/)
+      - "~/pgdata:/var/lib/postgresql/data:Z" # best-practice: volume is mounted to a linux directory
     healthcheck:
       test: [ "CMD", "pg_isready", "-U" ]
       interval: 5s
@@ -25,6 +26,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: "root"
     ports:
       - "8080:80"
+
   # provide jupyter 
   jupyter-nb:
     image: jupyter/minimal-notebook
