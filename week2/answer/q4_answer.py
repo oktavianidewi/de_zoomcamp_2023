@@ -46,7 +46,7 @@ def etl_web_to_gcs(month, year, color) -> None:
     write_gcs(path)
     return len(df)
 
-@flow(log=True)
+@flow(log_prints=True)
 def etl_web_to_gcs_parent(months, year, color):
     total_rows = 0
     for month in months:
