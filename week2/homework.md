@@ -7,13 +7,10 @@ Using the `etl_web_to_gcs.py` flow that loads taxi data into GCS as a guide, cre
 How many rows does that dataset have?
 
 ### Answer
-* 447,770
-* 766,792
-* 299,234
-* 822,132
+**447,770**
 
 _Explanation_
-TBD
+![result](./answer/q1-result.png)
 
 
 ## Question 2. Scheduling with Cron
@@ -23,22 +20,28 @@ Cron is a common scheduling specification for workflows.
 Using the flow in `etl_web_to_gcs.py`, create a deployment to run on the first of every month at 5am UTC. What’s the cron schedule for that?
 
 ### Answer
-
-- `0 5 1 * *`
-- `0 0 5 1 *`
-- `5 * 1 0 *`
-- `* * 5 1 0`
+**`0 5 1 * *`**
 
 _Explanation_
-TBD
+We can create a delpoyment and set a schedule in one-line command via CLI.
+```
+prefect deployment build answer/q2-answer.py:etl_web_to_gcs -n "question-2" \
+    --cron "0 5 1 * *" \
+    --apply
+```
+Result: 
+![result-a](./answer/q2-result-a.png)
+
+Screenshot on Orion UI dashboard:
+![result-b](./answer/q2-result-b.png)
 
 ## Question 3. Loading data to BigQuery 
 
-Using `etl_gcs_to_bq.py` as a starting point, modify the script for extracting data from GCS and loading it into BigQuery. This new script should not fill or remove rows with missing values. (The script is really just doing the E and L parts of ETL).
+Using etl_gcs_to_bq.py as a starting point, modify the script for extracting data from GCS and loading it into BigQuery. This new script should not fill or remove rows with missing values. (The script is really just doing the E and L parts of ETL).
 
 The main flow should print the total number of rows processed by the script. Set the flow decorator to log the print statement.
 
-Parametrize the entrypoint flow to accept a list of months, a year, and a taxi color. 
+Parametrize the entrypoint flow to accept a list of months, a year, and a taxi color.
 
 Make any other necessary changes to the code for it to function as required.
 
@@ -46,19 +49,44 @@ Create a deployment for this flow to run in a local subprocess with local flow c
 
 Make sure you have the parquet data files for Yellow taxi data for Feb. 2019 and March 2019 loaded in GCS. Run your deployment to append this data to your BiqQuery table. How many rows did your flow code process?
 
-### Answer
-
-- 14,851,920
-- 12,282,990
-- 27,235,753
-- 11,338,483
+## Answer
+**14,851,920**
 
 _Explanation_
-TBD
+
+- ingest data for Yellow taxi data for Feb-March 2019
+```
+python3 answer/q3_answer_gcs.py
+```
+- register a parameterized gcs-to-gcp flow 
+```
+prefect deployment build answer/q3_answer_bq.py:etl_parent_flow \
+    --name "question-3"
+```
+- change the parameters in  `etl_parent_flow-deployment.yaml` to: 
+```
+  color: yellow
+  months:
+  - 2
+  - 3
+  year: 2019
+```
+- apply the new parameters to the deployment 
+```
+prefect deployment apply etl_parent_flow-deployment.yaml
+```
+- start the agent 
+```
+prefect agent start -q default  
+```
+- go to the Orion UI to run the deployment
+![run-deployment](./answer/q3-run-deployment.png)
+
+- Screenshot on Orion UI dashboard:
+![result](./answer/q3-result.png)
 
 ## Question 4. Github Storage Block
-
-Using the `web_to_gcs` script from the videos as a guide, you want to store your flow code in a GitHub repository for collaboration with your team. Prefect can look in the GitHub repo to find your flow code and read it. Create a GitHub storage block from the UI or in Python code and use that in your Deployment instead of storing your flow code locally or baking your flow code into a Docker image. 
+Using the web_to_gcs script from the videos as a guide, you want to store your flow code in a GitHub repository for collaboration with your team. Prefect can look in the GitHub repo to find your flow code and read it. Create a GitHub storage block from the UI or in Python code and use that in your Deployment instead of storing your flow code locally or baking your flow code into a Docker image.
 
 Note that you will have to push your code to GitHub, Prefect will not push it for you.
 
@@ -67,14 +95,32 @@ Run your deployment in a local subprocess (the default if you don’t specify an
 How many rows were processed by the script?
 
 ### Answer
-
-- 88,019
-- 192,297
-- 88,605
-- 190,225
+**88,605**
 
 _Explanation_
-TBD
+- Modify web_to_gcs code, upload to github
+- Create a GitHub storage block from the UI (screenshot)
+![storage-block](./answer/q4-github-block.png)
+
+
+- Create and run deployment
+```
+prefect deployment build answer/q4_answer.py:etl_web_to_gcs_parent -n "question-4" \
+    --params='{"color": "green", "months": [11], "year": "2020"}' \
+    --storage-block="github/ingest-data" \
+    --apply
+
+prefect deployment run 'etl-web-to-gcs-parent/question-4'
+
+```
+- Map agent to the currently running deployment 
+```
+prefect agent start -q default
+```
+
+- Get the number of row counts
+
+![result](./answer/q4-result.png)
 
 
 ## Question 5. Email or Slack notifications
@@ -101,25 +147,49 @@ Alternatively, you can grab the webhook URL from your own Slack workspace and Sl
 How many rows were processed by the script?
 
 ### Answer
-
-- `125,268`
-- `377,922`
-- `728,390`
-- `514,392`
+**`514,392`**
 
 _Explanation_
-TBD
+- create account and workspace here https://app.prefect.cloud/
+- go to your profile > settings > API Keys, add new API Keys. this api-key will be used to login to prefect using CLI.
+- then, change prefect local configurations to prefect cloud, here are the steps: 
+```
+$ prefect cloud login -k <your-prefect-api-key-login> --workspace "<your-workspace-name>"
+
+# copy PREFECT_API_URL from url browser
+$ prefect config set PREFECT_API_URL="https://app.prefect.cloud/account/<account-id>/workspace/<workspace-id>"
+
+$ prefect config set PREFECT_API_KEY="<prefect-api-key>"
+```
+- create GCP, GCS and github blocks, as what you've made in Orion UI
+
+- On Prefect Cloud UI > Automation, create automations. I setup 3 automations: 2 will notify to a slack channel, 1 will notify to my email.
+![automations](./answer/q5-automations.png)
+
+
+- Create and run a deployment to ingest Green Taxi data at April, 2019. Then map an agent to it.
+- Turns out, there is an email notification coming when the deployment in a `running` or `complete` state. Hence, no notification in slack channel.
+
+
+![completed-flow](./answer/q5-succeed-flow.png)
+
+
+![email-notification](./answer/q5-email-notification.png)
+
+
+- here are the total number of the processed rows 
+
+![result](./answer/q5-result.png)
+
 
 ## Question 6. Secrets
 
 Prefect Secret blocks provide secure, encrypted storage in the database and obfuscation in the UI. Create a secret block in the UI that stores a fake 10-digit password to connect to a third-party service. Once you’ve created your block in the UI, how many characters are shown as asterisks (*) on the next page of the UI?
 
 ### Answer
-
-- 5
-- 6
-- 8
-- 10
+**8**
 
 _Explanation_
-TBD
+
+I created the secret block from the UI and here is the result:
+![result](./answer/q6-result.png)
