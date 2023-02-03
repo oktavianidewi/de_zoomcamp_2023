@@ -44,11 +44,14 @@ def etl_web_to_gcs(month, year, color) -> None:
     df = fetch(dataset_url)
     path = write_local(df, color, dataset_file)
     write_gcs(path)
+    return len(df)
 
-@flow()
+@flow(log=True)
 def etl_web_to_gcs_parent(months, year, color):
+    total_rows = 0
     for month in months:
-        etl_web_to_gcs(month, year, color)
+        total_rows += etl_web_to_gcs(month, year, color)
+    print("total rows ", total_rows)
 
 if __name__ == "__main__":
     color = "yellow"
