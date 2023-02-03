@@ -10,7 +10,7 @@ How many rows does that dataset have?
 **447,770**
 
 _Explanation_
-![result](./answer/q1-result.png)
+![result](./answer/q1_result.png)
 
 
 ## Question 2. Scheduling with Cron
@@ -30,10 +30,10 @@ prefect deployment build answer/q2-answer.py:etl_web_to_gcs -n "question-2" \
     --apply
 ```
 Result: 
-![result-a](./answer/q2-result-a.png)
+![result-a](./answer/q2_result_a.png)
 
 Screenshot on Orion UI dashboard:
-![result-b](./answer/q2-result-b.png)
+![result-b](./answer/q2_result_b.png)
 
 ## Question 3. Loading data to BigQuery 
 
@@ -80,10 +80,10 @@ prefect deployment apply etl_parent_flow-deployment.yaml
 prefect agent start -q default  
 ```
 - go to the Orion UI to run the deployment
-![run-deployment](./answer/q3-run-deployment.png)
+![run-deployment](./answer/q3_run_deployment.png)
 
 - Screenshot on Orion UI dashboard:
-![result](./answer/q3-result.png)
+![result](./answer/q3_result.png)
 
 ## Question 4. Github Storage Block
 Using the web_to_gcs script from the videos as a guide, you want to store your flow code in a GitHub repository for collaboration with your team. Prefect can look in the GitHub repo to find your flow code and read it. Create a GitHub storage block from the UI or in Python code and use that in your Deployment instead of storing your flow code locally or baking your flow code into a Docker image.
@@ -100,7 +100,7 @@ How many rows were processed by the script?
 _Explanation_
 - Modify web_to_gcs code, upload to github
 - Create a GitHub storage block from the UI (screenshot)
-![storage-block](./answer/q4-github-block.png)
+![storage-block](./answer/q4_github_block.png)
 
 
 - Create and run deployment
@@ -120,7 +120,7 @@ prefect agent start -q default
 
 - Get the number of row counts
 
-![result](./answer/q4-result.png)
+![result](./answer/q4_result.png)
 
 
 ## Question 5. Email or Slack notifications
@@ -164,22 +164,22 @@ $ prefect config set PREFECT_API_KEY="<prefect-api-key>"
 - create GCP, GCS and github blocks, as what you've made in Orion UI
 
 - On Prefect Cloud UI > Automation, create automations. I setup 3 automations: 2 will notify to a slack channel, 1 will notify to my email.
-![automations](./answer/q5-automations.png)
+![automations](./answer/q5_automations.png)
 
 
 - Create and run a deployment to ingest Green Taxi data at April, 2019. Then map an agent to it.
 - Turns out, there is an email notification coming when the deployment in a `running` or `complete` state. Hence, no notification in slack channel.
 
 
-![completed-flow](./answer/q5-succeed-flow.png)
+![completed-flow](./answer/q5_succeed_flow.png)
 
 
-![email-notification](./answer/q5-email-notification.png)
+![email-notification](./answer/q5_email_notification.png)
 
 
 - here are the total number of the processed rows 
 
-![result](./answer/q5-result.png)
+![result](./answer/q5_result.png)
 
 
 ## Question 6. Secrets
@@ -192,4 +192,4 @@ Prefect Secret blocks provide secure, encrypted storage in the database and obfu
 _Explanation_
 
 I created the secret block from the UI and here is the result:
-![result](./answer/q6-result.png)
+![result](./answer/q6_result.png)
