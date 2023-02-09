@@ -3,7 +3,6 @@ import pandas as pd
 from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
 from prefect_gcp import GcpCredentials
-from q3_answer_gcs import etl_web_to_gcs_parent
 
 @task(retries=3)
 def local_path(year: int, month: int) -> Path:
