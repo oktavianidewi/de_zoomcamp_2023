@@ -4,22 +4,26 @@ from prefect import flow, task
 from prefect_gcp.cloud_storage import GcsBucket
 from prefect_gcp import GcpCredentials
 
+
 @task(retries=3)
 def local_path(year: int, month: int) -> Path:
     """Construct local path"""
-    return Path(f"data/fhv_tripdata_{year}-{month}.csv.gz")
+    return Path(f"week3/data/fhv_tripdata_{year}-{month:02}.csv.gz")
 
 
 @task()
 def transform(path: Path) -> pd.DataFrame:
     """Data cleaning example"""
     df = pd.read_csv(path)
+    df["pickup_datetime"] = pd.to_datetime(df["pickup_datetime"])
+    df["dropOff_datetime"] = pd.to_datetime(df["dropOff_datetime"])
     return df
 
 @task()
 def write_bq(df: pd.DataFrame) -> None:
     """Write DataFrame to BiqQuery"""
 
+    # gcp_credentials_block = GcpCredentials.load("sa-prefect-de-zoomcamp-gcs")
     gcp_credentials_block = GcpCredentials.load("sa-prefect-de-zoomcamp")
 
     df.to_gbq(
