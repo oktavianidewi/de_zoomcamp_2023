@@ -1,0 +1,11 @@
+version: 2
+
+sources: 
+  - name: staging
+    database: dtc-de-zoomcamp-2023-376219 # database = project_id in bq
+    schema: trips_data_all # schema = dataset in bq
+
+    tables: 
+      - name: green_tripdata
+      - name: yellow_tripdata
+      - name: fhv_tripdata
