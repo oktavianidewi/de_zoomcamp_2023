@@ -17,3 +17,22 @@ docker-spin-up:
 
 docker-spin-down:
 	docker compose down
+
+gcloud-init: 
+	gcloud auth login --no-launch-browser
+	gcloud config set project dtc-de-zoomcamp-2023-376219
+
+tf-init:
+	terraform -chdir=./tf init
+
+infra-up:
+	terraform -chdir=./tf apply
+
+upload-to-gcs:
+	gsutil -m cp -r data/pq/ gs://dtc_data_lake_taxi_dtc-de-zoomcamp-2023-376219
+
+infra-down:
+	terraform -chdir=./tf destroy
+
+infra-config:
+	terraform -chdir=./tf output
