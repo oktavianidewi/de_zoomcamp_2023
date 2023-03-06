@@ -11,6 +11,9 @@ week5/output/
 week5/images/
 week5/*.md
 week5/*.drawio
+week5/tf/.terraform
+week5/tf/.terraform.*
+week5/tf/terraform.*
 
 week6/data/
 week6/images/
