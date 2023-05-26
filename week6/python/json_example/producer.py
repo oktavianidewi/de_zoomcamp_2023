@@ -15,6 +15,7 @@ class JsonProducer(KafkaProducer):
     @staticmethod
     def read_records(resource_path: str):
         records = []
+        # rest api
         with open(resource_path, 'r') as f:
             reader = csv.reader(f)
             header = next(reader)  # skip the header row
